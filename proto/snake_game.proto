@@ -1,0 +1,447 @@
+syntax = "proto3";
+
+package snake_game;
+option go_package = "./proto";
+
+// 大厅服务
+service LobbyService {
+  // 用户注册
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  // 用户登录
+  rpc Login(LoginRequest) returns (LoginResponse);
+  // 获取用户资料
+  rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse);
+  // 用户登出
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+}
+
+// 匹配服务
+service MatchingService {
+  // 寻找匹配
+  rpc FindMatch(FindMatchRequest) returns (FindMatchResponse);
+  // 取消匹配
+  rpc CancelMatch(CancelMatchRequest) returns (CancelMatchResponse);
+  // 获取等待玩家数量
+  rpc GetWaitingPlayers(GetWaitingPlayersRequest) returns (GetWaitingPlayersResponse);
+  // 获取在线玩家
+  rpc GetOnlinePlayers(GetOnlinePlayersRequest) returns (GetOnlinePlayersResponse);
+}
+
+// 房间服务
+service RoomService {
+  // 创建房间
+  rpc CreateRoom(CreateRoomRequest) returns (CreateRoomResponse);
+  // 加入房间
+  rpc JoinRoom(JoinRoomRequest) returns (JoinRoomResponse);
+  // 离开房间
+  rpc LeaveRoom(LeaveRoomRequest) returns (LeaveRoomResponse);
+  // 发送消息
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  // 获取房间消息
+  rpc GetRoomMessages(GetRoomMessagesRequest) returns (GetRoomMessagesResponse);
+  // 开始游戏
+  rpc StartGame(StartGameRequest) returns (StartGameResponse);
+}
+
+// 排行榜服务
+service LeaderboardService {
+  // 获取排行榜
+  rpc GetLeaderboard(GetLeaderboardRequest) returns (GetLeaderboardResponse);
+  // 更新分数
+  rpc UpdateScore(UpdateScoreRequest) returns (UpdateScoreResponse);
+  // 获取用户排名
+  rpc GetUserRank(GetUserRankRequest) returns (GetUserRankResponse);
+}
+
+// 游戏服务
+service GameService {
+  // 加入游戏
+  rpc JoinGame(JoinGameRequest) returns (JoinGameResponse);
+  // 离开游戏
+  rpc LeaveGame(LeaveGameRequest) returns (LeaveGameResponse);
+  // 移动指令
+  rpc Move(MoveRequest) returns (MoveResponse);
+  // 获取游戏状态
+  rpc GetGameState(GetGameStateRequest) returns (GetGameStateResponse);
+  // 订阅游戏状态更新
+  rpc SubscribeGameUpdates(SubscribeGameUpdatesRequest) returns (stream GameUpdate);
+}
+
+// 好友服务
+service FriendsService {
+  // 添加好友
+  rpc AddFriend(AddFriendRequest) returns (AddFriendResponse);
+  // 删除好友
+  rpc RemoveFriend(RemoveFriendRequest) returns (RemoveFriendResponse);
+  // 获取好友列表
+  rpc GetFriends(GetFriendsRequest) returns (GetFriendsResponse);
+  // 发送好友请求
+  rpc SendFriendRequest(SendFriendRequestRequest) returns (SendFriendRequestResponse);
+  // 回应好友请求
+  rpc RespondFriendRequest(RespondFriendRequestRequest) returns (RespondFriendRequestResponse);
+}
+
+// 通用类型定义
+message User {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  bool online = 4;
+  int64 created_at = 5;
+}
+
+message PlayerInfo {
+  string player_id = 1;
+  string username = 2;
+  int32 rating = 3;
+}
+
+message Position {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message SnakeSegment {
+  Position position = 1;
+}
+
+message GameSnake {
+  string player_id = 1;
+  repeated SnakeSegment segments = 2;
+  string color = 3;
+  int32 length = 4;
+  int32 score = 5;
+}
+
+// 大厅服务消息
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+}
+
+message RegisterResponse {
+  bool success = 1;
+  string message = 2;
+  string user_id = 3;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string message = 2;
+  string user_id = 3;
+  string username = 4;
+}
+
+message GetUserProfileRequest {
+  string user_id = 1;
+}
+
+message GetUserProfileResponse {
+  bool success = 1;
+  string message = 2;
+  User user = 3;
+  int32 score = 4;
+  int32 games_won = 5;
+  int32 games_played = 6;
+}
+
+message LogoutRequest {
+  string user_id = 1;
+}
+
+message LogoutResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// 匹配服务消息
+message FindMatchRequest {
+  string player_id = 1;
+  string username = 2;
+  int32 rating = 3;
+}
+
+message FindMatchResponse {
+  bool success = 1;
+  string message = 2;
+  string room_id = 3;
+  repeated PlayerInfo players = 4;
+}
+
+message CancelMatchRequest {
+  string player_id = 1;
+}
+
+message CancelMatchResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetWaitingPlayersRequest {}
+
+message GetWaitingPlayersResponse {
+  int32 count = 1;
+}
+
+message GetOnlinePlayersRequest {}
+
+message GetOnlinePlayersResponse {
+  bool success = 1;
+  string message = 2;
+  repeated PlayerInfo players = 3;
+}
+
+// 房间服务消息
+message CreateRoomRequest {
+  string user_id = 1;
+  string room_name = 2;
+  int32 max_players = 3;
+}
+
+message CreateRoomResponse {
+  bool success = 1;
+  string message = 2;
+  string room_id = 3;
+}
+
+message JoinRoomRequest {
+  string room_id = 1;
+  string user_id = 2;
+}
+
+message JoinRoomResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message LeaveRoomRequest {
+  string room_id = 1;
+  string user_id = 2;
+}
+
+message LeaveRoomResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message SendMessageRequest {
+  string room_id = 1;
+  string sender_id = 2;
+  string content = 3;
+  string type = 4; // text, system, etc.
+}
+
+message SendMessageResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetRoomMessagesRequest {
+  string room_id = 1;
+  int32 limit = 2;
+  int64 since = 3;
+}
+
+message GetRoomMessagesResponse {
+  bool success = 1;
+  string message = 2;
+  repeated Message messages = 3;
+}
+
+message StartGameRequest {
+  string room_id = 1;
+}
+
+message StartGameResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message Message {
+  string id = 1;
+  string room_id = 2;
+  string sender_id = 3;
+  string sender_username = 4;
+  string content = 5;
+  string type = 6;
+  int64 created_at = 7;
+}
+
+// 排行榜服务消息
+message GetLeaderboardRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message GetLeaderboardResponse {
+  bool success = 1;
+  string message = 2;
+  repeated LeaderboardEntry entries = 3;
+}
+
+message LeaderboardEntry {
+  string user_id = 1;
+  string username = 2;
+  int32 score = 3;
+  int32 rank = 4;
+}
+
+message UpdateScoreRequest {
+  string user_id = 1;
+  int32 score = 2;
+  bool game_won = 3;
+}
+
+message UpdateScoreResponse {
+  bool success = 1;
+  string message = 2;
+  int32 new_score = 3;
+  int32 rank = 4;
+}
+
+message GetUserRankRequest {
+  string user_id = 1;
+}
+
+message GetUserRankResponse {
+  bool success = 1;
+  string message = 2;
+  int32 rank = 3;
+  int32 total_users = 4;
+}
+
+// 游戏服务消息
+message JoinGameRequest {
+  string room_id = 1;
+  string player_id = 2;
+}
+
+message JoinGameResponse {
+  bool success = 1;
+  string message = 2;
+  repeated GameSnake initial_snakes = 3;
+  repeated Position foods = 4;
+  repeated Position walls = 5;
+}
+
+message LeaveGameRequest {
+  string room_id = 1;
+  string player_id = 2;
+}
+
+message LeaveGameResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+enum Direction {
+  NONE = 0;
+  UP = 1;
+  DOWN = 2;
+  LEFT = 3;
+  RIGHT = 4;
+}
+
+message MoveRequest {
+  string room_id = 1;
+  string player_id = 2;
+  Direction direction = 3;
+}
+
+message MoveResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetGameStateRequest {
+  string room_id = 1;
+}
+
+message GetGameStateResponse {
+  bool success = 1;
+  string message = 2;
+  repeated GameSnake snakes = 3;
+  repeated Position foods = 4;
+  repeated Position walls = 5;
+  string status = 6;
+}
+
+message SubscribeGameUpdatesRequest {
+  string room_id = 1;
+  string player_id = 2;
+}
+
+message GameUpdate {
+  string type = 1; // snake_moved, food_eaten, game_over, etc.
+  repeated GameSnake snakes = 2;
+  repeated Position foods = 3;
+  repeated Position walls = 4;
+  repeated string eliminated_players = 5;
+  string winner_player_id = 6;
+  string status = 7;
+}
+
+// 好友服务消息
+message AddFriendRequest {
+  string user_id = 1;
+  string friend_username = 2;
+}
+
+message AddFriendResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message RemoveFriendRequest {
+  string user_id = 1;
+  string friend_user_id = 2;
+}
+
+message RemoveFriendResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetFriendsRequest {
+  string user_id = 1;
+}
+
+message GetFriendsResponse {
+  bool success = 1;
+  string message = 2;
+  repeated FriendInfo friends = 3;
+}
+
+message FriendInfo {
+  string user_id = 1;
+  string username = 2;
+  bool online = 3;
+  string status = 4; // accepted, pending, blocked
+}
+
+message SendFriendRequestRequest {
+  string user_id = 1;
+  string target_user_id = 2;
+}
+
+message SendFriendRequestResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message RespondFriendRequestRequest {
+  string user_id = 1;
+  string request_user_id = 2;
+  bool accepted = 3; // true to accept, false to reject
+}
+
+message RespondFriendRequestResponse {
+  bool success = 1;
+  string message = 2;
+}

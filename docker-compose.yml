@@ -1,44 +1,129 @@
 version: '3.8'
 
 services:
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
+  # MongoDB 数据库
+  mongodb:
+    image: mongo:latest
+    container_name: snake_game_mongodb
     ports:
-      - "9090:9090"
+      - "27017:27017"
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
     restart: unless-stopped
 
-  grafana:
-    image: grafana/grafana-enterprise
-    container_name: grafana
+  # API网关服务
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-gateway
     ports:
-      - "3000:3000"
-    volumes:
-      - grafana-storage:/var/lib/grafana
-    restart: unless-stopped
+      - "8080:8080"
+    environment:
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017
     depends_on:
-      - prometheus
+      - mongodb
+      - lobby-service
+      - matching-service
+      - room-service
+      - leaderboard-service
+      - game-service
+      - friends-service
+    command: ["./bin/gateway_server"]
+    restart: unless-stopped
 
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
-    container_name: otel-collector
-    ports:
-      - "4317:4317"  # gRPC receiver
-      - "4318:4318"  # HTTP receiver
-      - "8888:8888"  # Prometheus metrics exposed by the collector
-    volumes:
-      - ./monitoring/otel-collector-config.yaml:/etc/otel-collector-config.yaml
-    command: ["--config=/etc/otel-collector-config.yaml"]
+  # 大厅服务（用户注册登录）
+  lobby-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lobby-service
+    expose:
+      - "50051"
+    environment:
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017
+    depends_on:
+      - mongodb
+    command: ["./bin/lobby_server"]
+    restart: unless-stopped
+
+  # 匹配服务
+  matching-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: matching-service
+    expose:
+      - "50052"
+    environment:
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017
+    depends_on:
+      - mongodb
+    command: ["./bin/matching_server"]
+    restart: unless-stopped
+
+  # 房间服务
+  room-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: room-service
+    expose:
+      - "50053"
+    environment:
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017
+    depends_on:
+      - mongodb
+    command: ["./bin/room_server"]
+    restart: unless-stopped
+
+  # 排行榜服务
+  leaderboard-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: leaderboard-service
+    expose:
+      - "50054"
+    environment:
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017
+    depends_on:
+      - mongodb
+    command: ["./bin/leaderboard_server"]
+    restart: unless-stopped
+
+  # 游戏服务
+  game-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: game-service
+    expose:
+      - "50055"
+    environment:
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017
+    depends_on:
+      - mongodb
+    command: ["./bin/game_server"]
+    restart: unless-stopped
+
+  # 好友服务
+  friends-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: friends-service
+    expose:
+      - "50056"
+    environment:
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017
+    depends_on:
+      - mongodb
+    command: ["./bin/friends_server"]
     restart: unless-stopped
 
 volumes:
-  grafana-storage:
+  mongodb_data:

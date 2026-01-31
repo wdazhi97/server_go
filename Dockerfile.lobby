@@ -1,0 +1,21 @@
+# Runtime image for Snake Game Lobby Service
+FROM alpine:latest
+
+# Install ca-certificates for HTTPS requests
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+# Create bin directory
+RUN mkdir -p ./bin
+
+# Copy pre-built lobby binary
+COPY bin/lobby_server ./bin/lobby_server
+
+# Make binary executable
+RUN chmod +x ./bin/*
+
+# Expose port
+EXPOSE 50051
+
+CMD ["./bin/lobby_server"]

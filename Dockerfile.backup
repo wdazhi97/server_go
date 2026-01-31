@@ -1,0 +1,50 @@
+# Multi-stage build for Snake Game Services
+
+# Build stage
+FROM golang:1.25-alpine AS builder
+
+# Install git (needed for go modules)
+RUN apk add --no-cache git ca-certificates
+
+# Set working directory
+WORKDIR /app
+
+# Copy go mod files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build binaries
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/lobby_server lobby/server.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/matching_server matching/server.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/room_server room/server.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/leaderboard_server leaderboard/server.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/game_server game/server.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/friends_server friends/server.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/gateway_server gateway/main.go
+
+# Final stage
+FROM alpine:latest
+
+# Install ca-certificates for HTTPS requests
+RUN apk --no-cache add ca-certificates bash
+
+WORKDIR /root/
+
+# Copy binaries from builder stage
+COPY --from=builder /app/bin/lobby_server ./bin/lobby_server
+COPY --from=builder /app/bin/matching_server ./bin/matching_server
+COPY --from=builder /app/bin/room_server ./bin/room_server
+COPY --from=builder /app/bin/leaderboard_server ./bin/leaderboard_server
+COPY --from=builder /app/bin/game_server ./bin/game_server
+COPY --from=builder /app/bin/friends_server ./bin/friends_server
+COPY --from=builder /app/bin/gateway_server ./bin/gateway_server
+
+# Expose ports (though services will be run individually in containers)
+EXPOSE 8080 50051 50052 50053 50054 50055 50056
+
+CMD ["./bin/gateway_server"]
