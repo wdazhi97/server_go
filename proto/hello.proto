@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package hello;
+option go_package = "./proto";
+
+// 定义一个简单的问候服务
+service HelloService {
+  // 一元 RPC
+  rpc SayHello (HelloRequest) returns (HelloResponse);
+  // 流式 RPC
+  rpc SayHelloStream (stream HelloRequest) returns (stream HelloResponse);
+}
+
+message HelloRequest {
+  string name = 1;
+  string message = 2;
+}
+
+message HelloResponse {
+  string message = 1;
+  int64 timestamp = 2;
+}
