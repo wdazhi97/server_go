@@ -72,3 +72,4 @@ go run cmd/server/main.go
 - Prometheus: http://localhost:9090
 - Grafana: http://localhost:3000 (默认用户名/密码: admin/admin)
 - OpenTelemetry 收集器指标: http://localhost:8888
+
