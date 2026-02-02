@@ -1,9 +1,9 @@
 # Simple build for Snake Game Services
 
-FROM golang:1.25-alpine AS builder
+FROM golang:1.25-bookworm AS builder
 
 # Install git (needed for go modules)
-RUN apk add --no-cache git ca-certificates
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
@@ -27,10 +27,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o bin/lobby_server lobby/server.go && \
     CGO_ENABLED=0 GOOS=linux go build -o bin/gateway_server gateway/main.go
 
 # Final stage
-FROM alpine:latest
+FROM ubuntu:24.04
 
 # Install ca-certificates for HTTPS requests
-RUN apk --no-cache add ca-certificates
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root/
 

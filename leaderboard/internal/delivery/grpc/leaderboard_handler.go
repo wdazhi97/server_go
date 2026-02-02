@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"snake-game/leaderboard/internal/usecase"
-	pb "snake-game/proto_new"
+	pb "snake-game/proto"
 )
 
 type LeaderboardHandler struct {

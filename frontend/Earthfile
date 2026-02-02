@@ -1,0 +1,15 @@
+# Frontend：单独构建时用 earthly ./frontend+docker（在仓库根目录执行）
+# 不拷贝父目录，通过 BUILD ../+frontend-build 使用根目录的构建结果
+VERSION 0.8
+
+build:
+  BUILD ../+frontend-build
+
+docker:
+  BUILD +build
+  FROM ubuntu:24.04
+  RUN apt-get update && apt-get install -y --no-install-recommends nginx && rm -rf /var/lib/apt/lists/*
+  COPY nginx.conf /etc/nginx/conf.d/default.conf
+  COPY +build/out /usr/share/nginx/html
+  CMD ["nginx", "-g", "daemon off;"]
+  SAVE IMAGE snake-game-frontend:latest

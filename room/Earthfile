@@ -1,0 +1,12 @@
+# Room：单独构建时用 earthly ./room+docker（在仓库根目录执行）
+VERSION 0.8
+
+build:
+  BUILD ../+room-build
+
+docker:
+  BUILD +build
+  FROM ../buildtool+runtime
+  COPY +build/room_server ./bin/room_server
+  RUN chmod +x ./bin/*
+  SAVE IMAGE snake-game-room:latest

@@ -5,7 +5,7 @@ import (
 
 	"snake-game/game/domain/entity"
 	"snake-game/game/internal/usecase"
-	pb "snake-game/proto_new"
+	pb "snake-game/proto"
 )
 
 type GameHandler struct {

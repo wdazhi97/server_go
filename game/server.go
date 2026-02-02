@@ -8,7 +8,7 @@ import (
 	grpc_handler "snake-game/game/internal/delivery/grpc"
 	"snake-game/game/internal/repository"
 	"snake-game/game/internal/usecase"
-	pb "snake-game/proto_new"
+	pb "snake-game/proto"
 )
 
 func main() {

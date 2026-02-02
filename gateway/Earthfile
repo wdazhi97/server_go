@@ -1,0 +1,14 @@
+# Gateway：单独构建时用 earthly ./gateway+docker（在仓库根目录执行）
+# 不拷贝父目录，通过 BUILD ../+gateway-build 使用根目录的编译结果
+VERSION 0.8
+
+build:
+  BUILD ../+gateway-build
+
+docker:
+  BUILD ../+gateway-build
+  BUILD ../buildtool+runtime
+  FROM ../buildtool+runtime
+  COPY ../+gateway-build/gateway_server ./bin/gateway_server
+  RUN chmod +x ./bin/*
+  SAVE IMAGE snake-game-gateway:latest

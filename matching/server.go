@@ -10,7 +10,7 @@ import (
 	"snake-game/matching/internal/repository"
 	"snake-game/matching/internal/usecase"
 	"snake-game/mongodb"
-	pb "snake-game/proto_new"
+	pb "snake-game/proto"
 )
 
 func main() {

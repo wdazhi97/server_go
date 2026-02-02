@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package lobby_service;
+option go_package = "./proto";
+
+import "proto/common.proto";
+
+// 大厅服务
+service LobbyService {
+  // 用户注册
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  // 用户登录
+  rpc Login(LoginRequest) returns (LoginResponse);
+  // 获取用户资料
+  rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse);
+  // 用户登出
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+}
+
+// 大厅服务消息
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+}
+
+message RegisterResponse {
+  bool success = 1;
+  string message = 2;
+  string user_id = 3;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string message = 2;
+  string user_id = 3;
+  string username = 4;
+}
+
+message GetUserProfileRequest {
+  string user_id = 1;
+}
+
+message GetUserProfileResponse {
+  bool success = 1;
+  string message = 2;
+  common.User user = 3;
+  int32 score = 4;
+  int32 games_won = 5;
+  int32 games_played = 6;
+}
+
+message LogoutRequest {
+  string user_id = 1;
+}
+
+message LogoutResponse {
+  bool success = 1;
+  string message = 2;
+}

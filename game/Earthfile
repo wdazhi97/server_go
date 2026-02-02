@@ -1,0 +1,12 @@
+# Game：单独构建时用 earthly ./game+docker（在仓库根目录执行）
+VERSION 0.8
+
+build:
+  BUILD ../+game-build
+
+docker:
+  BUILD +build
+  FROM ../buildtool+runtime
+  COPY +build/game_server ./bin/game_server
+  RUN chmod +x ./bin/*
+  SAVE IMAGE snake-game-game:latest

@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package common;
+option go_package = "./proto";
+
+// 通用类型定义
+message User {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  bool online = 4;
+  int64 created_at = 5;
+}
+
+message PlayerInfo {
+  string player_id = 1;
+  string username = 2;
+  int32 rating = 3;
+}
+
+message Position {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message SnakeSegment {
+  Position position = 1;
+}
+
+message GameSnake {
+  string player_id = 1;
+  repeated SnakeSegment segments = 2;
+  string color = 3;
+  int32 length = 4;
+  int32 score = 5;
+}
+
+enum Direction {
+  NONE = 0;
+  UP = 1;
+  DOWN = 2;
+  LEFT = 3;
+  RIGHT = 4;
+}
+
+message Message {
+  string id = 1;
+  string room_id = 2;
+  string sender_id = 3;
+  string sender_username = 4;
+  string content = 5;
+  string type = 6;
+  int64 created_at = 7;
+}
+
+message LeaderboardEntry {
+  string user_id = 1;
+  string username = 2;
+  int32 score = 3;
+  int32 rank = 4;
+}
+
+message FriendInfo {
+  string user_id = 1;
+  string username = 2;
+  bool online = 3;
+  string status = 4; // accepted, pending, blocked
+}

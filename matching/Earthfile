@@ -1,0 +1,12 @@
+# Matching：单独构建时用 earthly ./matching+docker（在仓库根目录执行）
+VERSION 0.8
+
+build:
+  BUILD ../+matching-build
+
+docker:
+  BUILD +build
+  FROM ../buildtool+runtime
+  COPY +build/matching_server ./bin/matching_server
+  RUN chmod +x ./bin/*
+  SAVE IMAGE snake-game-matching:latest

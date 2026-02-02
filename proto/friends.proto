@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package friends_service;
+option go_package = "./proto";
+
+import "proto/common.proto";
+
+// 好友服务
+service FriendsService {
+  // 添加好友
+  rpc AddFriend(AddFriendRequest) returns (AddFriendResponse);
+  // 删除好友
+  rpc RemoveFriend(RemoveFriendRequest) returns (RemoveFriendResponse);
+  // 获取好友列表
+  rpc GetFriends(GetFriendsRequest) returns (GetFriendsResponse);
+  // 发送好友请求
+  rpc SendFriendRequest(SendFriendRequestRequest) returns (SendFriendRequestResponse);
+  // 回应好友请求
+  rpc RespondFriendRequest(RespondFriendRequestRequest) returns (RespondFriendRequestResponse);
+}
+
+// 好友服务消息
+message AddFriendRequest {
+  string user_id = 1;
+  string friend_username = 2;
+}
+
+message AddFriendResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message RemoveFriendRequest {
+  string user_id = 1;
+  string friend_user_id = 2;
+}
+
+message RemoveFriendResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetFriendsRequest {
+  string user_id = 1;
+}
+
+message GetFriendsResponse {
+  bool success = 1;
+  string message = 2;
+  repeated common.FriendInfo friends = 3;
+}
+
+message SendFriendRequestRequest {
+  string user_id = 1;
+  string target_user_id = 2;
+}
+
+message SendFriendRequestResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message RespondFriendRequestRequest {
+  string user_id = 1;
+  string request_user_id = 2;
+  bool accepted = 3; // true to accept, false to reject
+}
+
+message RespondFriendRequestResponse {
+  bool success = 1;
+  string message = 2;
+}

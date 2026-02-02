@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"snake-game/gateway/domain/repository"
-	pb "snake-game/proto_new"
+	pb "snake-game/proto"
 )
 
 type APIGatewayUsecase struct {

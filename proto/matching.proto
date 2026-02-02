@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package matching_service;
+option go_package = "./proto";
+
+import "proto/common.proto";
+
+// 匹配服务
+service MatchingService {
+  // 寻找匹配
+  rpc FindMatch(FindMatchRequest) returns (FindMatchResponse);
+  // 取消匹配
+  rpc CancelMatch(CancelMatchRequest) returns (CancelMatchResponse);
+  // 获取等待玩家数量
+  rpc GetWaitingPlayers(GetWaitingPlayersRequest) returns (GetWaitingPlayersResponse);
+  // 获取在线玩家
+  rpc GetOnlinePlayers(GetOnlinePlayersRequest) returns (GetOnlinePlayersResponse);
+}
+
+// 匹配服务消息
+message FindMatchRequest {
+  string player_id = 1;
+  string username = 2;
+  int32 rating = 3;
+}
+
+message FindMatchResponse {
+  bool success = 1;
+  string message = 2;
+  string room_id = 3;
+  repeated common.PlayerInfo players = 4;
+}
+
+message CancelMatchRequest {
+  string player_id = 1;
+}
+
+message CancelMatchResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetWaitingPlayersRequest {}
+
+message GetWaitingPlayersResponse {
+  int32 count = 1;
+}
+
+message GetOnlinePlayersRequest {}
+
+message GetOnlinePlayersResponse {
+  bool success = 1;
+  string message = 2;
+  repeated common.PlayerInfo players = 3;
+}

@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -49,6 +50,7 @@ func (uc *AuthUsecase) Register(ctx context.Context, username, password, email s
 	// 保存用户
 	userID, err := uc.userRepo.CreateUser(ctx, user)
 	if err != nil {
+		log.Printf("Failed to create user: %v", err)
 		return "", errors.New("failed to register user")
 	}
 

@@ -1,0 +1,12 @@
+# Friends：单独构建时用 earthly ./friends+docker（在仓库根目录执行）
+VERSION 0.8
+
+build:
+  BUILD ../+friends-build
+
+docker:
+  BUILD +build
+  FROM ../buildtool+runtime
+  COPY +build/friends_server ./bin/friends_server
+  RUN chmod +x ./bin/*
+  SAVE IMAGE snake-game-friends:latest

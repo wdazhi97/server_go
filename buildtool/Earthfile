@@ -1,0 +1,10 @@
+# 公共构建：Go 服务运行时基础镜像（Ubuntu 24.04 + ca-certificates）
+# 各服务 Earthfile 通过 FROM +buildtool/runtime 使用
+VERSION 0.8
+
+runtime:
+  FROM ubuntu:24.04
+  RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
+  WORKDIR /root
+  RUN mkdir -p ./bin
+  SAVE IMAGE

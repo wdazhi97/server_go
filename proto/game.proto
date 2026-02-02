@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package game_service;
+option go_package = "./proto";
+
+import "proto/common.proto";
+
+// 游戏服务
+service GameService {
+  // 加入游戏
+  rpc JoinGame(JoinGameRequest) returns (JoinGameResponse);
+  // 离开游戏
+  rpc LeaveGame(LeaveGameRequest) returns (LeaveGameResponse);
+  // 移动指令
+  rpc Move(MoveRequest) returns (MoveResponse);
+  // 获取游戏状态
+  rpc GetGameState(GetGameStateRequest) returns (GetGameStateResponse);
+  // 订阅游戏状态更新
+  rpc SubscribeGameUpdates(SubscribeGameUpdatesRequest) returns (stream GameUpdate);
+}
+
+// 游戏服务消息
+message GameUpdate {
+  string type = 1; // snake_moved, food_eaten, game_over, etc.
+  repeated common.GameSnake snakes = 2;
+  repeated common.Position foods = 3;
+  repeated common.Position walls = 4;
+  repeated string eliminated_players = 5;
+  string winner_player_id = 6;
+  string status = 7;
+}
+
+message JoinGameRequest {
+  string room_id = 1;
+  string player_id = 2;
+}
+
+message JoinGameResponse {
+  bool success = 1;
+  string message = 2;
+  repeated common.GameSnake initial_snakes = 3;
+  repeated common.Position foods = 4;
+  repeated common.Position walls = 5;
+}
+
+message LeaveGameRequest {
+  string room_id = 1;
+  string player_id = 2;
+}
+
+message LeaveGameResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message MoveRequest {
+  string room_id = 1;
+  string player_id = 2;
+  common.Direction direction = 3;
+}
+
+message MoveResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetGameStateRequest {
+  string room_id = 1;
+}
+
+message GetGameStateResponse {
+  bool success = 1;
+  string message = 2;
+  repeated common.GameSnake snakes = 3;
+  repeated common.Position foods = 4;
+  repeated common.Position walls = 5;
+  string status = 6;
+}
+
+message SubscribeGameUpdatesRequest {
+  string room_id = 1;
+  string player_id = 2;
+}
